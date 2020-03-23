@@ -27,7 +27,8 @@ nbformat==5.0.4
 notebook==6.0.3
 numpy==1.18.2
 open3d==0.9.0.0
-opencv-python==4.2.0.32
+opencv-contrib-python==3.4.2.17
+opencv-python==3.4.2.17
 pandocfilters==1.4.2
 parso==0.6.2
 pexpect==4.8.0

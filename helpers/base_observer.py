@@ -8,7 +8,7 @@ class BaseObserver(ABC):
     """
 
     @abstractmethod
-    def update(self, subject: BaseSubject) -> None:
+    def parent_update(self, subject: BaseSubject) -> None:
         """
         Receive update from subject.
         """

@@ -4,13 +4,14 @@ import numpy as np
 import cv2
 import time
 
-from sensors.d435_sensor import D435Sensor
-from sensors.t265_sensor import T265Sensor
+from sensors_wrappers.d435_sensor import D435Sensor
+from sensors_wrappers.t265_sensor import T265Sensor
 
 if __name__ == "__main__":
 
-    D435 = D435Sensor()
-    T265 = T265Sensor()
+    # D435 = D435Sensor(is_device=True, source_name='845112070910')
+    D435 = D435Sensor(is_device=False, source_name='data/435.bag')
+    T265 = T265Sensor(is_device=False, source_name='data/265.bag')  # change
     D435.attach(T265)
 
     D435.start_sensor()
@@ -18,9 +19,15 @@ if __name__ == "__main__":
 
     try:
         while True:
+            image = D435.get_image()
+            print(type(image))
+            if image is not None:
+                cv2.imshow('new', image)
             # actions here
             pass
     except KeyboardInterrupt:
         D435.stop_sensor()
         T265.stop_sensor()
 
+    print(D435.numbers)
+    print(T265.numbers)

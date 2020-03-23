@@ -8,10 +8,9 @@ class StoppableThread(threading.Thread):
     def __init__(self,  *args, **kwargs):
         super(StoppableThread, self).__init__(*args, **kwargs)
         self._execution_status = True
-#         self._stop_event = threading.Event()
 
     def stop(self):
         self._execution_status = False
 
-    def is_executed(self):
+    def is_execute(self):
         return self._execution_status
