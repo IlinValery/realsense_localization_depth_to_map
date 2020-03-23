@@ -20,9 +20,12 @@ if __name__ == "__main__":
     try:
         while True:
             image = D435.get_image()
-            print(type(image))
+
             if image is not None:
+                print(image.shape)
                 cv2.imshow('new', image)
+
+            time.sleep(1)
             # actions here
             pass
     except KeyboardInterrupt:
