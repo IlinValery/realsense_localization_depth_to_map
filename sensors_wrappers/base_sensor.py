@@ -2,6 +2,7 @@ from abc import abstractmethod
 import threading
 from helpers.custom_threading import StoppableThread
 import pyrealsense2 as rs
+import os
 
 
 class BaseSensor:
@@ -12,11 +13,19 @@ class BaseSensor:
         self.cfg = rs.config()
         self.pipe = rs.pipeline()
         if is_device:
-            print("Configured as device with id={}".format(source_name))
+            print("Sensor configured as device with id={}".format(source_name))
             self.cfg.enable_device(source_name)
         else:
-            print("Configured as file with name {}".format(source_name))
+            print("Sensor configured as file with name {}".format(source_name))
             self.cfg.enable_device_from_file(source_name)
+
+    def allow_writing_to_file(self, file_name, folder_name=None):
+        path_to_file = './{0}'.format(file_name)
+        if folder_name is not None:
+            path_to_file = './{0}/{1}'.format(folder_name, file_name)
+            if not os.path.exists(folder_name):
+                os.mkdir(folder_name)
+        self.cfg.enable_record_to_file(path_to_file)
 
     def start_sensor(self):
         try:
@@ -27,6 +36,7 @@ class BaseSensor:
             self.is_launched = False
 
         if self.is_launched: # rewrite this
+            self.pipe.start(self.cfg)
             self.update_thread.start()
 
     def stop_sensor(self):
@@ -39,6 +49,13 @@ class BaseSensor:
 
     @abstractmethod
     def do_sensor_update(self):
+        """
+        Realisation of custom sensor update
+        """
+        pass
+
+    @abstractmethod
+    def process_frameset(self):
         """
         Realisation of custom sensor update
         """
