@@ -38,4 +38,3 @@ class T265Sensor(BaseSensor, BaseObserver):
         T = np.hstack((rotation, translation))
         T = np.vstack((T, np.array([0, 0, 0, 1])))
         return T
-

@@ -9,12 +9,14 @@ class BaseSensor:
     def __init__(self, is_device, source_name):
         self.is_launched = False
         self.update_thread = None
+        self.frameset_number = 0
 
         self.cfg = rs.config()
         self.pipe = rs.pipeline()
         if is_device:
             print("Sensor configured as device with id={}".format(source_name))
-            self.cfg.enable_device(source_name)
+            if not (source_name is None or source_name == ''):
+                self.cfg.enable_device(source_name)
         else:
             print("Sensor configured as file with name {}".format(source_name))
             self.cfg.enable_device_from_file(source_name)
@@ -46,6 +48,10 @@ class BaseSensor:
     def thread_update(self):
         while threading.currentThread().is_execute():
             self.do_sensor_update()
+            self.frameset_number += 1
+
+    def get_frameset_number(self):
+        return self.frameset_number
 
     @abstractmethod
     def do_sensor_update(self):
