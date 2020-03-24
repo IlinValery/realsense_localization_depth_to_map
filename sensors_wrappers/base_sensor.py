@@ -13,6 +13,7 @@ class BaseSensor:
 
         self.cfg = rs.config()
         self.pipe = rs.pipeline()
+
         if is_device:
             print("Sensor configured as device with id={}".format(source_name))
             if not (source_name is None or source_name == ''):
@@ -48,7 +49,7 @@ class BaseSensor:
     def thread_update(self):
         while threading.currentThread().is_execute():
             self.do_sensor_update()
-            self.frameset_number += 1
+            # self.frameset_number += 1
 
     def get_frameset_number(self):
         return self.frameset_number
