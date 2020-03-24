@@ -10,32 +10,38 @@ from sensors_wrappers.t265_sensor import T265Sensor
 
 if __name__ == "__main__":
 
-    # D435 = D435Sensor(is_device=True, source_name='845112070910')0000943222110531
-    # T265 = T265Sensor(is_device=True, source_name='943222110531')  # change
-    D435 = D435Sensor(is_device=False, source_name='data/435.bag')
-    T265 = T265Sensor(is_device=False, source_name='data/265.bag')
+    D435 = D435Sensor(is_device=True, source_name='845112070910')  # 
+    T265 = T265Sensor(is_device=True, source_name='whatever')  # change 0000943222110531
+    # D435 = D435Sensor(is_device=False, source_name='data/435.bag')
+    # T265 = T265Sensor(is_device=False, source_name='data/265.bag')
     D435.attach(T265)
 
-    # # TODO: allow writing to files here
+    # TODO: allow writing to files here
     # D435.allow_writing_to_file("D435.bag")
     # T265.allow_writing_to_file("T265.bag")
 
-    D435.start_sensor()
     T265.start_sensor()
+    D435.start_sensor()
+
 
     try:
         while True:
-            image = D435.get_image()
 
+            color_frame, depth_frame = D435.get_frames()
+            pose265 = T265.get_pose()
+            if (color_frame is not None) and (pose265 is not None):
+                print('\nframeset435 gtab time', color_frame.get_timestamp())
+                print('pose265 grab time    ', pose265.get_timestamp())
 
-            if image is not None:
-                # print(image.shape)
-                pose = T265.get_coordinates()
-                print(pose)
-                cv2.imshow('D435 RGB Frame', image)
-                cv2.waitKey(1000)
+                transformation_matrix = T265.get_transformation()
+                # print('transformation_matrix',transformation_matrix)
 
-            # time.sleep(1)
+                color_image, depth_image = D435.get_images()
+                cv2.imshow('D435 RGB Frame', color_image)
+                depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
+                cv2.imshow('D435 Depth Frame', depth_image)
+                cv2.waitKey(100)
+
             # actions here
             pass
     except KeyboardInterrupt:

@@ -6,18 +6,18 @@ import os
 
 
 class BaseSensor:
-    def __init__(self, is_device, source_name):
+    def __init__(self):
         self.is_launched = False
         self.update_thread = None
 
         self.cfg = rs.config()
         self.pipe = rs.pipeline()
-        if is_device:
-            print("Sensor configured as device with id={}".format(source_name))
-            self.cfg.enable_device(source_name)
-        else:
-            print("Sensor configured as file with name {}".format(source_name))
-            self.cfg.enable_device_from_file(source_name)
+        # if is_device:
+        #     print("Sensor configured as device with id={}".format(source_name))
+        #     self.cfg.enable_device(source_name)
+        # else:
+        #     print("Sensor configured as file with name {}".format(source_name))
+        #     self.cfg.enable_device_from_file(source_name)
 
     def allow_writing_to_file(self, file_name, folder_name=None):
         path_to_file = './{0}'.format(file_name)
