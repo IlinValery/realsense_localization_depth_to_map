@@ -14,7 +14,7 @@ class D435Sensor(BaseSensor, BaseSubject):
         # Initialization of D435 sensor
         super(D435Sensor, self).__init__(is_device, source_name)
         self.cfg.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
-        self.cfg.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 30)
+        # self.cfg.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 30)
 
         # initialize observers
         self._observers: List[BaseObserver] = [] # pattern observer in common
@@ -46,7 +46,7 @@ class D435Sensor(BaseSensor, BaseSubject):
         # TODO extract necessary data here:
         self.color_frame = self.frameset.get_color_frame()
         self.depth_frame = self.frameset.get_depth_frame()
-        self.color_image = np.asanyarray(self.color_frame.get_data())
+        # self.color_image = np.asanyarray(self.color_frame.get_data())
         self.depth_image = np.asanyarray(self.depth_frame.get_data())
 
     def get_frameset(self):

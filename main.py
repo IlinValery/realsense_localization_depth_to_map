@@ -47,14 +47,14 @@ if __name__ == "__main__":
             color_frame, depth_frame = D435.get_frames()
             pose265 = T265.get_pose()
             if (color_frame is not None) and (pose265 is not None):
-                print('\nframeset435 gtab time', color_frame.get_timestamp())
+                # print('\nframeset435 gtab time', color_frame.get_timestamp())
                 print('pose265 grab time    ', pose265.get_timestamp())
 
                 transformation_matrix = T265.get_transformation()
                 print('transformation_matrix',transformation_matrix)
 
                 color_image, depth_image = D435.get_images()
-                cv2.imshow('D435 RGB Frame', color_image)
+                # cv2.imshow('D435 RGB Frame', color_image)
                 depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
                 cv2.imshow('D435 Depth Frame', depth_image)
                 cv2.waitKey(1)
