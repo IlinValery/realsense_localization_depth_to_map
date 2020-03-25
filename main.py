@@ -46,6 +46,10 @@ if __name__ == "__main__":
     # TODO: initial variables
     pose_number = 0
     transformation_matrix_set = []
+    transformation_D435 = []
+    transformation_trajectory_D435 = []
+    points_trajectory_D435 = []
+    points_trajectory_T265 = []
 
     # TODO: classes initialization + initial conditions for them
     if is_device:
@@ -89,9 +93,10 @@ if __name__ == "__main__":
             pose265 = T265.get_pose()
 
             if (depth_frame is not None) and (pose265 is not None):
-                print_timestamps(D435=depth_frame.get_timestamp(), T265=pose265.get_timestamp())
+                # print_timestamps(D435=depth_frame.get_timestamp(), T265=pose265.get_timestamp())
 
                 # TODO: extract grayscale image here and show images
+
                 # gray_image, depth_image = D435.get_images()
                 # depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
                 # cv2.imshow('D435 Depth Frame', depth_image)
@@ -101,8 +106,20 @@ if __name__ == "__main__":
                 transformation_matrix = T265.get_transformation()
                 # print('transformation_matrix', transformation_matrix)
 
-                # TODO: get transformation mask from D436
-                tr_mx = D435.get_transformation(init_guess=transformation_matrix)
+                # TODO: get transformation mask from D435
+                # D435.get_geom_pcl()
+                # tr_mx = D435.get_transformation(init_guess=transformation_matrix)
+                tr_mx = D435.get_transformation()
+                if tr_mx is not None:
+                    pose_number += 1
+                    transformation_D435.append(tr_mx)
+                    if len(transformation_D435) > 1:
+                        transformation_trajectory_D435.append(transformation_trajectory_D435[-1] @ tr_mx)
+                        points_trajectory_D435.append(transformation_trajectory_D435[-1][:3, -1])
+                    else:
+                        transformation_trajectory_D435.append(tr_mx)
+                        points_trajectory_D435.append(tr_mx[:3, -1])
+                # print(points_trajectory_D435)
                 # print('transformation_matrix435', tr_mx)
                 # D435.update_trajectory(max_point_pair_dist=5.0)
                 # print(D435.pose)
@@ -115,12 +132,18 @@ if __name__ == "__main__":
                         .reshape((-1, 3))
                     point_viewer.set_points(coordinates)
 
+
                 if show_plot_trajectory:
                     # TODO: save last N elements of trajectory to
                     # TODO: KeyboardInterrupt on plot
                     transformation_matrix_set.append(transformation_matrix)
+                    points_trajectory_T265.append(transformation_matrix[:3, -1])
                     plot_trajectory(transformation_matrix_set, ax, trajectories=[1])
 
+                if pose_number > 50:
+                    np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
+                    np.save('logs/points_trajectory_T265.npy', np.array(points_trajectory_T265))
+                    break
     except KeyboardInterrupt:
         D435.stop_sensor()
         T265.stop_sensor()
