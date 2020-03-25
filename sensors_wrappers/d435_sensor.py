@@ -27,6 +27,8 @@ class D435Sensor(BaseSensor, BaseSubject):
         self.depth_image = None
         # self.frameset_grab_time = None
 
+    # Методы ИЗДАТЕЛя
+    # Набор методов для управлениями подпискичами.
     def attach(self, observer: BaseObserver) -> None:
         self._observers.append(observer)
 

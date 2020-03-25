@@ -2,6 +2,8 @@ import cv2
 from sensors_wrappers.d435_sensor import D435Sensor
 from sensors_wrappers.t265_sensor import T265Sensor
 
+from data_processing import Pose_subscriber
+
 import time
 
 is_device = False
@@ -22,7 +24,18 @@ if __name__ == "__main__":
         D435 = D435Sensor(is_device=False, source_name='data/D435.bag')
         T265 = T265Sensor(is_device=False, source_name='data/T265.bag')
 
-    D435.attach(T265)
+
+
+
+    # D435 - Издатель
+    # T265 - Подписчик, как только прилетает новый фрейм D435 - T265 уведомляется об этом и запоминаем синхронизованную позицию
+    D435.attach(T265) # Присоединение наблюдателя/подписчика
+
+    # T265 - издатель
+    Pose = Pose_subscriber(T265) # подписчик
+    T265.attach(Pose)# Pose подписан на Т265
+
+
 
 
     D435.start_sensor()
@@ -34,7 +47,7 @@ if __name__ == "__main__":
         while True:
             # TODO: all manupulations with data here
             depth_frame = D435.get_frame()
-            pose265 = T265.get_pose()
+            pose265 = T265.get_sync_pose()
             if (depth_frame is not None) and (pose265 is not None):
                 print('\nframeset435 gtab time', depth_frame.get_timestamp())
                 print('pose265 grab time    ', pose265.get_timestamp())
