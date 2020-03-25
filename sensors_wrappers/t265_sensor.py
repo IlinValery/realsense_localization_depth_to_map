@@ -22,7 +22,7 @@ class T265Sensor(BaseSensor, BaseObserver, BaseSubject):
         # self.increment = 0
         # self.frameset_list = []
 
-    def parent_update(self, subject: BaseSubject) -> None:
+    def on_parent_update(self, subject: BaseSubject) -> None:
         self.sync_pose = self.pose
 
     def do_sensor_update(self):
@@ -67,4 +67,4 @@ class T265Sensor(BaseSensor, BaseObserver, BaseSubject):
 
     def notify(self) -> None:
         for observer in self._observers:
-            observer.parent_update(self)
+            observer.on_parent_update(self)
