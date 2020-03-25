@@ -70,8 +70,8 @@ class D435Sensor(BaseSensor, BaseSubject):
     def get_geom_pcl(self):
         pc = rs.pointcloud()
 #         pc.map_to(self.color_frame)
-        pcl1 = pc.calculate(self.depth_frame)
-        pcl1.export_to_ply('tmp.ply')
+        pcl = pc.calculate(self.depth_frame)
+        pcl.export_to_ply('tmp.ply', self.color_frame)
         pcl = o3d.io.read_point_cloud("tmp.ply")
         os.remove('tmp.ply')
         return pcl
