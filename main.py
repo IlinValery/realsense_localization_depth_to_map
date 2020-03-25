@@ -111,6 +111,7 @@ if __name__ == "__main__":
                 # tr_mx = D435.get_transformation(init_guess=transformation_matrix)
                 tr_mx = D435.get_transformation()
                 if tr_mx is not None:
+                    tr_mx = np.copy(tr_mx) * -1
                     pose_number += 1
                     transformation_D435.append(tr_mx)
                     if len(transformation_D435) > 1:
@@ -140,7 +141,7 @@ if __name__ == "__main__":
                     points_trajectory_T265.append(transformation_matrix[:3, -1])
                     plot_trajectory(transformation_matrix_set, ax, trajectories=[1])
 
-                if pose_number > 50:
+                if pose_number > 20:
                     np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
                     np.save('logs/points_trajectory_T265.npy', np.array(points_trajectory_T265))
                     break

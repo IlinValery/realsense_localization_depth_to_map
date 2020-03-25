@@ -29,7 +29,7 @@ class D435Sensor(BaseSensor, BaseSubject):
         # TODO: for monochrome
         # self.cfg.enable_stream(rs.stream.infrared, 848, 480, rs.format.y8, 30) # uncomment if have color
 
-        self.koef_sampling = 2 ** 3
+        self.koef_sampling = 2 ** 2
         self.tm_T265toD435 = np.load('configs/T265toD435.npy')
 
         print(self.tm_T265toD435)
@@ -108,39 +108,50 @@ class D435Sensor(BaseSensor, BaseSubject):
         coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(points.size(), 3))
         coordinates = coordinates[coordinates[:, 2] != 0]
 
-        coordinates = np.hstack((coordinates, np.ones((coordinates.shape[0], 1))))
-        return (self.tm_T265toD435 @ coordinates.T).T[:, :-1]
-
+        coordinates = self.apply_transformation(self.tm_T265toD435, coordinates)
+        return coordinates
 
     @staticmethod
-    def convert_to_pcl(coordinates):
+    def apply_transformation(transformation, points):
         """
-            TODO
-        :param coordinates:
+
+        :param transformation:
+        :param points:
         :return:
         """
-        if coordinates is None:
+        if transformation is None or points is None:
             return None
         else:
-            return o3d.geometry.PointCloud(o3d.utility.Vector3dVector(coordinates))
+            coordinates = np.hstack((points, np.ones((points.shape[0], 1))))
+            return (transformation @ coordinates.T).T[:, :-1]
 
+    @staticmethod
+    def convert_to_pcl(points):
+        """
+            TODO
+        :param points:
+        :return:
+        """
+        if points is None:
+            return None
+        else:
+            return o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
 
     @timing
-    def get_transformation(self, max_point_pair_dist=10.0, init_guess=np.eye(4)):
-        old_pcl = self.convert_to_pcl(self.point_cloud) # n-1
-        self.point_cloud = self.get_coordinates()
+    def get_transformation(self, max_point_pair_dist=0.2, init_guess=np.eye(4)):
+        old_point_cloud = self.apply_transformation(self.prev_tm, self.point_cloud)
+        old_pcl = self.convert_to_pcl(old_point_cloud) # n-1
+        self.point_cloud = self.apply_transformation(self.prev_tm, self.get_coordinates())
         if old_pcl is None:
             self.prev_tm = init_guess
             print("\n\n\n{}\n\n\n".format(init_guess))
             return None
 
-        coordinates = np.hstack((self.point_cloud, np.ones((self.point_cloud.shape[0], 1))))
-        self.point_cloud = (self.prev_tm @ coordinates.T).T[:, :-1]
+        new_pcl = self.convert_to_pcl(self.point_cloud) # n
 
-        pcl_points = self.convert_to_pcl(self.point_cloud) # n
-
-        # T@(T_dif@p)
-        tr_mx = o3d.registration.registration_icp(old_pcl, pcl_points, max_point_pair_dist, init_guess).transformation
+        tr_mx = o3d.registration.registration_icp(old_pcl, new_pcl, max_point_pair_dist,
+                                                  self.prev_tm, o3d.registration.TransformationEstimationPointToPoint())\
+            .transformation
         self.prev_tm = tr_mx
         return tr_mx
 
