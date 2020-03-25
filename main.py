@@ -61,8 +61,19 @@ if __name__ == "__main__":
 # >>>>>>> master
                 print('pose265 grab time    ', pose265.get_timestamp())
 
-                transformation_matrix = T265.get_transformation()
-                print('transformation_matrix',transformation_matrix)
+# <<<<<<< zainulina-develop
+# #                 transformation_matrix = T265.get_transformation()
+# #                 print('transformation_matrix',transformation_matrix)
+                
+# #                 tr_mx = D435.get_transformation(init_guess=transformation_matrix)
+# #                 print('transformation_matrix435',tr_mx)
+
+# #                 D435.update_trajectory(max_point_pair_dist=5.0)
+# #                 print(D435.pose)
+# =======
+#                 transformation_matrix = T265.get_transformation()
+#                 print('transformation_matrix',transformation_matrix)
+# >>>>>>> master
 
 # <<<<<<< perminov-develop
 #                 color_image, depth_image = D435.get_images()
