@@ -1,5 +1,7 @@
 venv/
+venv*
 .idea/
+data/
 .ipynb_checkpoints
 ipynb/
 *.bag
