@@ -33,7 +33,7 @@ class T265Sensor(BaseSensor, BaseObserver):
             data = self.sync_pose.get_pose_data()
             data_rot = [float(i.strip('xyzw: ')) for i in str(data.rotation).split(', ')]
             r = R.from_quat(data_rot)
-            rotation = np.array(r.as_matrix()) #  np.array(r.as_matrix()) for scipy > 1.4.0, else: np.array(r.as_dcm()) 
+            rotation = np.array(r.as_matrix())
             translation = np.array([float(i.strip('xyzw: ')) for i in str(data.translation).split(', ')])[np.newaxis].T
             T = np.hstack((rotation, translation))
             T = np.vstack((T, np.array([0, 0, 0, 1])))
