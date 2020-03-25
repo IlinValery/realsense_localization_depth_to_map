@@ -1,4 +1,7 @@
 import cv2
+import numpy as np
+import pyrealsense2 as rs
+from plot.plot_points import PointCloudVisualizer
 from sensors_wrappers.d435_sensor import D435Sensor
 from sensors_wrappers.t265_sensor import T265Sensor
 
@@ -21,21 +24,36 @@ if __name__ == "__main__":
     T265 = T265Sensor(is_device=False, source_name='data/265.bag')
     D435.attach(T265)
 
+    point_viewer = PointCloudVisualizer(update_each_frames=30)
+    D435.attach(point_viewer)
+
     T265.start_sensor()
     D435.start_sensor()
+
+
 
     try:
         while True:
             # TODO: all manupulations with data here
-            color_frame, depth_frame = D435.get_frames()
+            # color_frame, depth_frame = D435.get_frames()
+            depth_frame = D435.get_depth_frame()
             pose265 = T265.get_pose()
-            if (color_frame is not None) and (pose265 is not None):
-                print('\nframeset435 gtab time', color_frame.get_timestamp())
-                print('pose265 grab time    ', pose265.get_timestamp())
+
+            if (depth_frame is not None) and (pose265 is not None):
+                # print('\nframeset435 gtab time', color_frame.get_timestamp())
+                # print('pose265 grab time', pose265.get_timestamp())
+
+                pc = rs.pointcloud()
+                points = pc.calculate(depth_frame).as_points()
+                coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(480, 848, 3)).reshape((-1,3))
+
+                # coordinates = coo
+                # vtx = np.asanyarray(points.get_vertices())
 
                 # transformation_matrix = T265.get_transformation()
                 # print('transformation_matrix',transformation_matrix)
 
+                point_viewer.set_points(coordinates)
                 color_image, depth_image = D435.get_images()
                 cv2.imshow('D435 RGB Frame', color_image)
                 depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
