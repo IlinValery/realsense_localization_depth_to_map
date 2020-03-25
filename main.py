@@ -40,6 +40,7 @@ is_device = False
 is_write_to_bag = False
 show_plot_trajectory = True
 show_points = False
+tm_T265toD435 = np.load('config/T265toD435.npy')
 
 if __name__ == "__main__":
 
@@ -102,7 +103,7 @@ if __name__ == "__main__":
                 # print('transformation_matrix', transformation_matrix)
 
                 # TODO: get transformation mask from D436
-                tr_mx = D435.get_transformation(init_guess=transformation_matrix)
+                # tr_mx = D435.get_transformation(init_guess=transformation_matrix)
                 # print('transformation_matrix435', tr_mx)
                 # D435.update_trajectory(max_point_pair_dist=5.0)
                 # print(D435.pose)
@@ -118,8 +119,13 @@ if __name__ == "__main__":
                 if show_plot_trajectory:
                     # TODO: save last N elements of trajectory to
                     # TODO: KeyboardInterrupt on plot
-                    transformation_matrix_set.append(transformation_matrix)
-                    plot_trajectory(transformation_matrix_set, ax, trajectories=[1])
+                    # print("TM: ", tm_T265toD435)
+                    tr_mx_from_T265 = T265.get_transformation() @ tm_T265toD435
+                    tr_mx_from_D435 = D435.get_transformation(init_guess=tr_mx_from_T265)
+                    print(tr_mx_from_D435)
+                    if tr_mx_from_D435 is not None:
+                        transformation_matrix_set.append(tr_mx_from_D435)
+                        plot_trajectory(transformation_matrix_set, ax, trajectories=[1])
 
     except KeyboardInterrupt:
         D435.stop_sensor()

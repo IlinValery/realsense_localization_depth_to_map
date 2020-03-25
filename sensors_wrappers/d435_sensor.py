@@ -62,6 +62,9 @@ class D435Sensor(BaseSensor, BaseSubject):
     def process_frameset(self):
         # TODO extract necessary data here to D435 sensor object:
         self.depth_frame = self.frameset.get_depth_frame()
+        decimate = rs.decimation_filter()
+        decimate.set_option(rs.option.filter_magnitude, 4)
+        self.depth_frame = decimate.process(self.depth_frame)
         # self.gray_frame = self.frameset.get_infrared_frame()
 
     def get_frameset(self):
@@ -86,7 +89,7 @@ class D435Sensor(BaseSensor, BaseSubject):
     def get_geom_pcl(self): #slower
         pc = rs.pointcloud()
         points = pc.calculate(self.depth_frame).as_points()
-        coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(480, 848, 3)) \
+        coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(120, 212, 3)) \
             .reshape((-1, 3))
         coordinates = coordinates[coordinates[:, 2] != 0]
         pcl = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(coordinates))
