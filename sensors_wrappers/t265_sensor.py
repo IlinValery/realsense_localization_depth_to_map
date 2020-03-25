@@ -17,7 +17,7 @@ class T265Sensor(BaseSensor, BaseObserver):
         self.pose = None
         self.sync_pose = None
 
-    def parent_update(self, subject: BaseSubject) -> None:
+    def on_parent_update(self, subject: BaseSubject) -> None:
         self.sync_pose = self.pose
 
     def do_sensor_update(self):

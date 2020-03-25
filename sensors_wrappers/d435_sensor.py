@@ -42,7 +42,7 @@ class D435Sensor(BaseSensor, BaseSubject):
 
     def notify(self) -> None:
         for observer in self._observers:
-            observer.parent_update(self)
+            observer.on_parent_update(self)
 
     def do_sensor_update(self):
         self.frameset = self.pipe.wait_for_frames()
@@ -120,4 +120,6 @@ class D435Sensor(BaseSensor, BaseSubject):
         return self.depth_frame
 # >>>>>>> master
 
+    def get_depth_frame(self):
+        return self.depth_frame
 

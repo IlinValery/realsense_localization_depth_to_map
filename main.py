@@ -3,7 +3,13 @@
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages') # in order to import cv2 under python3
 import cv2
-sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages') # append back in order to import rospy
+# <<<<<<< ilin-develop
+# import numpy as np
+# import pyrealsense2 as rs
+# from plot.plot_points import PointCloudVisualizer
+# =======
+# sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages') # append back in order to import rospy
+# >>>>>>> master
 from sensors_wrappers.d435_sensor import D435Sensor
 from sensors_wrappers.t265_sensor import T265Sensor
 from plot.plot_trajectory import plot_trajectory
@@ -32,7 +38,14 @@ if __name__ == "__main__":
 
     D435.attach(T265)
 
+# <<<<<<< ilin-develop
+    point_viewer = PointCloudVisualizer(update_each_frames=30)
+    D435.attach(point_viewer)
 
+    T265.start_sensor()
+# =======
+
+# >>>>>>> master
     D435.start_sensor()
     if not is_device:
         time.sleep(0.25)  # give some time for 435.bag to startup
@@ -47,19 +60,38 @@ if __name__ == "__main__":
         ax = fig.add_subplot(111, projection='3d')
         plt.ion()
 
+
+
     try:
         while True:
             # TODO: all manupulations with data here
-            depth_frame = D435.get_frame()
-            pose265 = T265.get_pose()
-# <<<<<<< perminov-develop
-#             if (color_frame is not None) and (pose265 is not None):
-                # print('\nframeset435 gtab time', color_frame.get_timestamp())
+# <<<<<<< ilin-develop
+#             # color_frame, depth_frame = D435.get_frames()
+#             depth_frame = D435.get_depth_frame()
+#             pose265 = T265.get_pose()
+
+#             if (depth_frame is not None) and (pose265 is not None):
+#                 # print('\nframeset435 gtab time', color_frame.get_timestamp())
+#                 # print('pose265 grab time', pose265.get_timestamp())
+
+#                 pc = rs.pointcloud()
+#                 points = pc.calculate(depth_frame).as_points()
+#                 coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(480, 848, 3)).reshape((-1,3))
+
+#                 # coordinates = coo
+#                 # vtx = np.asanyarray(points.get_vertices())
 # =======
-            if (depth_frame is not None) and (pose265 is not None):
-                print('\nframeset435 gtab time', depth_frame.get_timestamp())
+#             depth_frame = D435.get_frame()
+#             pose265 = T265.get_pose()
+# # <<<<<<< perminov-develop
+# #             if (color_frame is not None) and (pose265 is not None):
+#                 # print('\nframeset435 gtab time', color_frame.get_timestamp())
+# # =======
+#             if (depth_frame is not None) and (pose265 is not None):
+#                 print('\nframeset435 gtab time', depth_frame.get_timestamp())
+# # >>>>>>> master
+#                 print('pose265 grab time    ', pose265.get_timestamp())
 # >>>>>>> master
-                print('pose265 grab time    ', pose265.get_timestamp())
 
 # <<<<<<< zainulina-develop
 # #                 transformation_matrix = T265.get_transformation()
@@ -75,12 +107,18 @@ if __name__ == "__main__":
 #                 print('transformation_matrix',transformation_matrix)
 # >>>>>>> master
 
-# <<<<<<< perminov-develop
+# <<<<<<< ilin-develop
+#                 point_viewer.set_points(coordinates)
 #                 color_image, depth_image = D435.get_images()
+#                 cv2.imshow('D435 RGB Frame', color_image)
 # =======
-                depth_image = D435.get_image()
+# # <<<<<<< perminov-develop
+# #                 color_image, depth_image = D435.get_images()
+# # =======
+#                 depth_image = D435.get_image()
+# # >>>>>>> master
+#                 # cv2.imshow('D435 RGB Frame', color_image)
 # >>>>>>> master
-                # cv2.imshow('D435 RGB Frame', color_image)
                 depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
                 cv2.imshow('D435 Depth Frame', depth_image)
                 cv2.waitKey(33)
