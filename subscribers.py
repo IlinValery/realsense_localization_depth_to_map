@@ -13,8 +13,8 @@ class T265subscriber(BaseObserver):
         if current_pose is not None:
             self.pose_list.append(current_pose.get_pose_data()) # -> Good
             self.time_list.append(current_pose.get_timestamp()) # -> Good
-            print('time_list[-1]', self.time_list[-1])
-            print('pose_list[-1].translation', self.pose_list[-1].translation)
+            # print('time_list[-1]', self.time_list[-1])
+            # print('pose_list[-1].translation', self.pose_list[-1].translation)
             # self.some_list.append(current_pose)  # -> Bad. TODO: do copy.copy() to save the raw current_pose -> Problem with pickle
 
     def optimize_trajectory(self):
