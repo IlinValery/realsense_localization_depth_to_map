@@ -46,9 +46,9 @@ class D435Sensor(BaseSensor, BaseSubject):
         #for trajectory
 
         self.point_cloud = None
-        self.prev_tm = None
-        self.pose = np.eye(3)
-        self.trajectory = [np.zeros(3)]
+        self.prev_tm = np.eye(4)
+#         self.pose = np.eye(3)
+#         self.trajectory = [np.zeros(3)]
 
     def attach(self, observer: BaseObserver) -> None:
         self._observers.append(observer)
@@ -81,27 +81,18 @@ class D435Sensor(BaseSensor, BaseSubject):
 #     def get_frames(self):
 #         return self.color_frame, self.depth_frame
     
-    def get_geom_pcl(self):
-        pc = rs.pointcloud()
-#         pc.map_to(self.color_frame)
-        pcl = pc.calculate(self.depth_frame)
-        pcl.export_to_ply('tmp.ply', self.color_frame)
-        pcl = o3d.io.read_point_cloud("tmp.ply")
-        os.remove('tmp.ply')
-        return pcl
+#     def get_geom_pcl(self):
+#         pc = rs.pointcloud()
+# #         pc.map_to(self.color_frame)
+#         pcl = pc.calculate(self.depth_frame)
+#         pcl.export_to_ply('tmp.ply', self.color_frame)
+#         pcl = o3d.io.read_point_cloud("tmp.ply")
+#         os.remove('tmp.ply')
+#         return pcl
 
     def get_depth_image(self):
         return np.asanyarray(self.depth_frame.get_data())
-        
     
-    # def get_geom_pcl(self):
-    #     pc = rs.pointcloud()
-    #     pcl1 = pc.calculate(self.depth_frame)
-    #     pcl1.export_to_ply('tmp.ply')
-    #     pcl = o3d.io.read_point_cloud("tmp.ply")
-    #     os.remove('tmp.ply')
-    #     return pcl
-
     @timing
     def get_coordinates(self, make_sampling=True):
         """
@@ -152,34 +143,21 @@ class D435Sensor(BaseSensor, BaseSubject):
             return o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
 
     @timing
-    def get_transformation(self, max_point_pair_dist=0.2, init_guess=np.eye(4)):
-        old_point_cloud = self.apply_transformation(self.prev_tm, self.point_cloud)
+    def get_transformation(self, max_point_pair_dist=0.05, init_guess=np.eye(4)):
+        old_point_cloud = self.point_cloud 
         old_pcl = self.convert_to_pcl(old_point_cloud) # n-1
-        self.point_cloud = self.apply_transformation(self.prev_tm, self.get_coordinates())
+        self.point_cloud = self.get_coordinates()
         if old_pcl is None:
             self.prev_tm = init_guess
-            print("\n\n\n{}\n\n\n".format(init_guess))
-            return None
+            return self.prev_tm
 
         new_pcl = self.convert_to_pcl(self.point_cloud) # n
 
-        tr_mx = o3d.registration.registration_icp(old_pcl, new_pcl, max_point_pair_dist,
-                                                  self.prev_tm, o3d.registration.TransformationEstimationPointToPoint())\
+        tr_mx = o3d.registration.registration_icp(new_pcl, old_pcl, max_point_pair_dist,
+                                                  init_guess, o3d.registration.TransformationEstimationPointToPoint())\
             .transformation
-        self.prev_tm = tr_mx
-        return tr_mx
-
-    def update_trajectory(self, max_point_pair_dist=10.0, init_guess=np.eye(4)):
-        tr_mx = self.get_transformation(max_point_pair_dist, init_guess)
-        if tr_mx is None:
-            return
-        t_est = tr_mx[:3, -1]
-        R_est = tr_mx[:3, :3]
-        R = R_est @ self.pose
-        t = self.trajectory[-1] + (np.linalg.inv(R) @ t_est).ravel()
-                    
-        self.pose = R
-        self.trajectory.append(t)
+        self.prev_tm = self.prev_tm @ tr_mx
+        return self.prev_tm
 
 
 
