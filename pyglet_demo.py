@@ -8,7 +8,6 @@ from helpers.custom_threading import StoppableThread
 import pyglet
 import trimesh
 import trimesh.viewer
-import trimesh.transformations as tf
 from functools import wraps
 
 
@@ -21,6 +20,7 @@ def timing(f):
         print('----------func:%r took: %2.4f sec' % (f.__name__, time_end-time_start))
         return result
     return wrap
+
 
 class Application:
     def __init__(self, resolution=0.1):
@@ -41,7 +41,7 @@ class Application:
 
         self.scene_widget = trimesh.viewer.SceneWidget(scene)
         hbox.add(self.scene_widget)
-        # clear from cube ¯\_(ツ)_/¯
+        # clear from cube ¯\_(ツ)_/¯ to delete useless geometry
         self.scene_widget.scene.delete_geometry(self.geometry_name)
         gui.add(hbox)
 
@@ -64,11 +64,14 @@ class Application:
     def _start_processing(self):
         """
         Like main.py, the same loop, but as different thread :)
-        :return:
+        :return: None
         """
-
+        # TODO initialisation from main.py
         while threading.currentThread().is_execute():
+            # loop body from main.py
             time.sleep(0.5)
+
+            # render points
             self.points = self.all_points[:self.current_batch]
             self.current_batch += int(self.batch)
             if self.current_batch > self.all_points.shape[0]:
@@ -77,10 +80,19 @@ class Application:
             self.is_changed = True
 
     def _stop_processing(self):
+        """
+        Stop main_thread
+        :return: None
+        """
         self.main_thread.stop()
 
     @staticmethod
     def get_colors(points):
+        """
+        Making RGB colormap for points
+        :param points: np.array((Nx3))
+        :return: colors - np.array((Nx3))
+        """
         size = points.shape[0]
         blue = np.linspace(1., 0., size // 2)
         blue1 = np.zeros(size - (size // 2))
@@ -99,10 +111,20 @@ class Application:
 
     @staticmethod
     def get_sorted_points(points):
+        """
+        Make a sort by one of the axis (y)
+        :param points: np.array((Nx3))
+        :return: same sorted points array
+        """
         return points[points[:, 1].argsort()][::-1]
 
     # @timing
     def get_occupied_points(self, points):
+        """
+        Calculate an Octomap for PC
+        :param points: np.array((Nx3))
+        :return: occupied points (Kx3)
+        """
         octree = octomap.OcTree(self.resolution)
         octree.insertPointCloud(
             pointcloud=np.double(points),
@@ -134,6 +156,12 @@ class Application:
             self.scene_widget._draw()
 
     def _create_window(self, width, height):
+        """
+        Making pyglet.window for visualisation
+        :param width: window width
+        :param height: window height
+        :return:
+        """
         try:
             config = pyglet.gl.Config(sample_buffers=1,
                                       samples=4,
