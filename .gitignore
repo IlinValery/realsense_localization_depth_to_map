@@ -1,7 +1,8 @@
 venv/
 venv*
 .idea/
-data/
+data/*
+!/data/pcl_comb_opt.pcd
 .ipynb_checkpoints
 ipynb/
 *.bag
