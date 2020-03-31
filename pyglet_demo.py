@@ -50,7 +50,7 @@ class Application:
         self.render_points = self.points
         self.is_changed = True
         # self.is_updated = False
-        pcd = o3d.io.read_point_cloud("notebooks/pcl_comb_opt.pcd")
+        pcd = o3d.io.read_point_cloud("data/pcl_comb_opt.pcd")
         self.all_points = np.asarray(pcd.points)
         self.batch = self.all_points.shape[0]/1000
         self.current_batch = 1
