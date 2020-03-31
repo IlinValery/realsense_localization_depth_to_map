@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
                     plot_trajectory(ax, t265=transformation_matrix_set265, d435=transformation_matrix_set435)
 
-                # if pose_number > 20:
+                # if pose_number > max_trajectory_length:
                 #     np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
                 #     np.save('logs/points_trajectory_T265.npy', np.array(points_trajectory_T265))
                 #     break
