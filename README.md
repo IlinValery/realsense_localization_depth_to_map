@@ -70,7 +70,7 @@ sudo ln -s /lib/x86_64-linux-gnu/libz.so.1
 ### Preparing
 To launch this project you have to download bag files by [link](https://drive.google.com/open?id=1mgudOdZlnPuyCJGJV6N4l2ZX7HhZN2hI) and paste them to the data folder.
 
-If you want to use real sensor, you have to change Variable is_real in main.py
+If you want to use real sensor, you have to change Variable ```is_device=True``` in main.py
 
 ### Common launching
 ```bash
@@ -81,6 +81,11 @@ python main.py
 This launching is just for demo because we got a log delay between frames
 ```bash
 python pyglet_demo.py
+```
+### PPTK and full map demo
+```bash
+cd plot/perminov_plotting
+python oct_viz.py
 ```
 
 ### Notebooks
