@@ -1,12 +1,12 @@
-import time
-from functools import wraps
-
 import numpy as np
 from sensors_wrappers.base_sensor import BaseSensor
 from helpers.base_observer import BaseSubject, BaseObserver
 from typing import List
 import pyrealsense2 as rs
 import open3d as o3d
+
+import time
+from functools import wraps
 
 
 def timing(f):
@@ -26,12 +26,8 @@ class D435Sensor(BaseSensor, BaseSubject):
         # Initialization of D435 sensor
         super(D435Sensor, self).__init__(is_device, source_name)
         self.cfg.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
-        # TODO: for monochrome
-        # self.cfg.enable_stream(rs.stream.infrared, 848, 480, rs.format.y8, 30) # uncomment if have color
-
         self.koef_sampling = 2 ** 2
         self.tm_T265toD435 = np.load('configs/T265toD435.npy')
-
         # print(self.tm_T265toD435)
 
         # initialize observers
@@ -48,8 +44,6 @@ class D435Sensor(BaseSensor, BaseSubject):
 
         self.point_cloud = None
         self.prev_tm = np.eye(4)
-#         self.pose = np.eye(3)
-#         self.trajectory = [np.zeros(3)]
 
     def attach(self, observer: BaseObserver) -> None:
         self._observers.append(observer)
@@ -69,7 +63,7 @@ class D435Sensor(BaseSensor, BaseSubject):
     def process_frameset(self):
         # TODO extract necessary data here to D435 sensor object:
         self.depth_frame = self.frameset.get_depth_frame()
-        # self.gray_frame = self.frameset.get_infrared_frame()
+
 
     def get_frameset(self):
         return self.frameset
@@ -77,19 +71,6 @@ class D435Sensor(BaseSensor, BaseSubject):
     # TODO: get functions here:
     def get_depth_frame(self):
         return self.depth_frame
-
-# <<<<<<< zainulina-develop
-#     def get_frames(self):
-#         return self.color_frame, self.depth_frame
-    
-#     def get_geom_pcl(self):
-#         pc = rs.pointcloud()
-# #         pc.map_to(self.color_frame)
-#         pcl = pc.calculate(self.depth_frame)
-#         pcl.export_to_ply('tmp.ply', self.color_frame)
-#         pcl = o3d.io.read_point_cloud("tmp.ply")
-#         os.remove('tmp.ply')
-#         return pcl
 
     def get_depth_image(self):
         return np.asanyarray(self.depth_frame.get_data())
@@ -159,8 +140,3 @@ class D435Sensor(BaseSensor, BaseSubject):
             .transformation
         self.prev_tm = self.prev_tm @ tr_mx
         return self.prev_tm
-
-
-
-
-
