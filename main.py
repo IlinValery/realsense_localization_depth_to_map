@@ -46,7 +46,8 @@ if __name__ == "__main__":
 
     # TODO: initial variables
     pose_number = 0
-    transformation_matrix_set = []
+    transformation_matrix_set265 = []
+    transformation_matrix_set435 = []
     transformation_D435 = []
     transformation_trajectory_D435 = []
     points_trajectory_D435 = []
@@ -86,6 +87,8 @@ if __name__ == "__main__":
         ax = fig.add_subplot(111, projection='3d')
         plt.ion()
 
+    prev_t265_tr_mx = None
+    cur_time = 0
     try:
         while True:
             # TODO: all manipulations with data here
@@ -103,7 +106,18 @@ if __name__ == "__main__":
                 cv2.imshow('D435 Depth Frame', depth_image)
                 cv2.waitKey(33)
 
-                transformation_matrix = T265.get_transformation()
+                if depth_frame.get_timestamp() < cur_time:
+                    prev_t265_tr_mx = None
+                    D435.point_cloud = None
+                cur_time = depth_frame.get_timestamp()
+                    
+                transformation_matrix265 = T265.get_transformation()
+                if prev_t265_tr_mx is None:
+                    rel_tr_mx_265 = transformation_matrix265.copy()
+                else:
+                    rel_tr_mx_265 = np.linalg.inv(prev_t265_tr_mx) @ transformation_matrix265
+                
+                prev_t265_tr_mx = transformation_matrix265.copy()
                 # print('transformation_matrix', transformation_matrix)
 
                 # pc = D435.get_coordinates()
@@ -113,21 +127,17 @@ if __name__ == "__main__":
 
                 # TODO: get transformation mask from D435
                 # D435.get_geom_pcl()
-                # tr_mx = D435.get_transformation(init_guess=transformation_matrix)
-
-
-                # tr_mx = D435.get_transformation()
-                # if tr_mx is not None:
-                #     tr_mx = np.copy(tr_mx) * -1
-                #     pose_number += 1
-                #     transformation_D435.append(tr_mx)
-                #     if len(transformation_D435) > 1:
-                #         transformation_trajectory_D435.append(transformation_trajectory_D435[-1] @ tr_mx)
-                #         points_trajectory_D435.append(transformation_trajectory_D435[-1][:3, -1])
-                #     else:
-                #         transformation_trajectory_D435.append(tr_mx)
-                #         points_trajectory_D435.append(tr_mx[:3, -1])
-
+                transformation_matrix435 = D435.get_transformation(init_guess=rel_tr_mx_265)
+#                 if tr_mx is not None:
+#                     tr_mx = np.copy(tr_mx) * -1
+#                     pose_number += 1
+#                     transformation_D435.append(tr_mx)
+#                     if len(transformation_D435) > 1:
+#                         transformation_trajectory_D435.append(transformation_trajectory_D435[-1] @ tr_mx)
+#                         points_trajectory_D435.append(transformation_trajectory_D435[-1][:3, -1])
+#                     else:
+#                         transformation_trajectory_D435.append(tr_mx)
+#                         points_trajectory_D435.append(tr_mx[:3, -1])
 
                 # print(points_trajectory_D435)
                 # print('transformation_matrix435', tr_mx)
@@ -146,9 +156,12 @@ if __name__ == "__main__":
                 if show_plot_trajectory:
                     # TODO: save last N elements of trajectory to
                     # TODO: KeyboardInterrupt on plot
-                    transformation_matrix_set.append(transformation_matrix)
-                    points_trajectory_T265.append(transformation_matrix[:3, -1])
-                    plot_trajectory(transformation_matrix_set, ax, trajectories=[1])
+                    transformation_matrix_set265.append(transformation_matrix265)
+                    points_trajectory_T265.append(transformation_matrix265[:3, -1])
+                    transformation_matrix_set435.append(transformation_matrix435)
+                    points_trajectory_D435.append(transformation_matrix435[:3, -1])
+#                     plot_trajectory(transformation_matrix_set265, ax, trajectories=[1])
+                    plot_trajectory(transformation_matrix_set435, ax, trajectories=[1])
 
                 # if pose_number > 20:
                 #     np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
