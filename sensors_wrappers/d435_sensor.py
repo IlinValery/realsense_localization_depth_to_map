@@ -32,7 +32,8 @@ class D435Sensor(BaseSensor, BaseSubject):
         self.koef_sampling = 2 ** 2
         self.tm_T265toD435 = np.load('configs/T265toD435.npy')
 
-        print(self.tm_T265toD435)
+        # print(self.tm_T265toD435)
+
         # initialize observers
         self._observers: List[BaseObserver] = [] # pattern observer in common
 

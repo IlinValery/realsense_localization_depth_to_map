@@ -10,6 +10,7 @@ import numpy as np
 import pyrealsense2 as rs
 
 # TODO: import project classes & functions here
+from plot.octomap_plotting import OctoMapVisualiser
 from sensors_wrappers.d435_sensor import D435Sensor
 from sensors_wrappers.t265_sensor import T265Sensor
 from plot.plot_trajectory import plot_trajectory
@@ -68,6 +69,7 @@ if __name__ == "__main__":
 
     D435.attach(T265)  # subscribe T265 on D435 updates
 
+    octo_visualiser = OctoMapVisualiser(update_time=2)
     point_viewer = PointCloudVisualizer(update_each_frames=30)
     if show_points:
         D435.attach(point_viewer)
@@ -92,7 +94,7 @@ if __name__ == "__main__":
             # TODO: all manipulations with data here
 
             depth_frame = D435.get_depth_frame()
-
+            depth_image = D435.get_depth_image()
             pose265 = T265.get_pose()
 
             if (depth_frame is not None) and (pose265 is not None):
@@ -100,11 +102,9 @@ if __name__ == "__main__":
 
                 # TODO: extract grayscale image here and show images
 
-                # gray_image, depth_image = D435.get_images()
-                # depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
-                # cv2.imshow('D435 Depth Frame', depth_image)
-                # cv2.imshow('D435 RGB Frame', grey_image)
-                # cv2.waitKey(33)
+                depth_image = cv2.convertScaleAbs(depth_image, alpha=0.03)
+                cv2.imshow('D435 Depth Frame', depth_image)
+                cv2.waitKey(33)
 
                 if depth_frame.get_timestamp() < cur_time:
                     prev_t265_tr_mx = None
@@ -120,9 +120,13 @@ if __name__ == "__main__":
                 prev_t265_tr_mx = transformation_matrix265.copy()
                 # print('transformation_matrix', transformation_matrix)
 
+                # pc = D435.get_coordinates()
+                # print(pc.shape)
+                # octo_visualiser.update_points(pc)
+
+
                 # TODO: get transformation mask from D435
                 # D435.get_geom_pcl()
-                
                 transformation_matrix435 = D435.get_transformation(init_guess=rel_tr_mx_265)
 #                 if tr_mx is not None:
 #                     tr_mx = np.copy(tr_mx) * -1
@@ -134,18 +138,19 @@ if __name__ == "__main__":
 #                     else:
 #                         transformation_trajectory_D435.append(tr_mx)
 #                         points_trajectory_D435.append(tr_mx[:3, -1])
+
                 # print(points_trajectory_D435)
                 # print('transformation_matrix435', tr_mx)
                 # D435.update_trajectory(max_point_pair_dist=5.0)
                 # print(D435.pose)
 
                 # TODO: Transformation points and append to existing (association)
-                if show_points:
-                    pc = rs.pointcloud()
-                    points = pc.calculate(depth_frame).as_points()
-                    coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(480, 848, 3)) \
-                        .reshape((-1, 3))
-                    point_viewer.set_points(coordinates)
+                # if show_points:
+                #     pc = rs.pointcloud()
+                #     points = pc.calculate(depth_frame).as_points()
+                #     coordinates = np.ndarray(buffer=points.get_vertices(), dtype=np.float32, shape=(480, 848, 3)) \
+                #         .reshape((-1, 3))
+                #     point_viewer.set_points(coordinates)
 
 
                 if show_plot_trajectory:
@@ -158,15 +163,18 @@ if __name__ == "__main__":
 #                     plot_trajectory(transformation_matrix_set265, ax, trajectories=[1])
                     plot_trajectory(transformation_matrix_set435, ax, trajectories=[1])
 
-                if pose_number > 20:
-                    np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
-                    np.save('logs/points_trajectory_T265.npy', np.array(points_trajectory_T265))
-                    break
+                # if pose_number > 20:
+                #     np.save('logs/points_trajectory_D435.npy', np.array(points_trajectory_D435))
+                #     np.save('logs/points_trajectory_T265.npy', np.array(points_trajectory_T265))
+                #     break
+
     except KeyboardInterrupt:
         D435.stop_sensor()
         T265.stop_sensor()
         if show_plot_trajectory:
             plt.show(block=True)
+        octo_visualiser.stop_visualiser()
     finally:
         D435.stop_sensor()
         T265.stop_sensor()
+        octo_visualiser.stop_visualiser()
