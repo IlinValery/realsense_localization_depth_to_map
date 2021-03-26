@@ -1,4 +1,6 @@
-# Perception in Robotics course final project (Term3 2020, Skoltech, Moscow-Russia)
+# realsense_localization_depth_to_map
+
+Perception in Robotics course final project (Term3 2020, Skoltech, Moscow-Russia)
 
 ## Project team
 - Evgeny Tsykunov (evgeny.tsykunov@skolkovotech.ru)
