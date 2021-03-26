@@ -33,7 +33,7 @@ jupyterlab==2.0.1
 jupyterlab-server==1.0.7
 kdtree==0.16
 kiwisolver==1.1.0
-lxml==4.5.0
+lxml==4.6.3
 MarkupSafe==1.1.1
 math3d==3.3.5
 matplotlib==3.2.1
