@@ -69,7 +69,7 @@ ptyprocess==0.6.0
 pycollada==0.7.1
 pyface==6.1.2
 pyglet==1.5.2
-Pygments==2.6.1
+Pygments==2.7.4
 pyntcloud==0.1.2
 pyparsing==2.4.6
 PyQt5==5.14.1
