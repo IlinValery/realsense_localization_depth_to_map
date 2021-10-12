@@ -50,7 +50,7 @@ notebook==6.0.3
 numpy==1.18.2
 octomap-python==1.8.0.post12
 open3d==0.9.0.0
-opencv-contrib-python==3.4.2.17
+opencv-contrib-python==3.4.7.28
 opencv-python==3.4.2.17
 packaging==20.3
 pandas==1.0.3
