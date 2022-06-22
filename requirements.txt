@@ -47,7 +47,7 @@ nbconvert==5.6.1
 nbformat==5.0.4
 networkx==2.4
 notebook==6.0.3
-numpy==1.18.2
+numpy==1.22.0
 octomap-python==1.8.0.post12
 open3d==0.9.0.0
 opencv-contrib-python==3.4.2.17
