@@ -103,7 +103,7 @@ triangle==20200325
 trimesh==3.6.17
 urllib3==1.25.8
 vecrec==0.3.0
-vtk==8.1.2
+vtk==9.0.1
 wcwidth==0.1.9
 webencodings==0.5.1
 widgetsnbextension==3.5.1
